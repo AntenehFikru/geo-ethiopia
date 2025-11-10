@@ -1,10 +1,17 @@
 from django.http import JsonResponse
+from .models import Location
 import random
 
 def random_location(request):
-    locations = [
-        {'name': 'Addis Ababa', 'image': '/media/locations/addis_ababa.jpg'},
-        {'name': 'Lalibela', 'image': '/media/locations/lalibela.jpg'},
-        {'name': 'Harar', 'image': '/media/locations/harar.jpg'},
-    ]
-    return JsonResponse(random.choice(locations))
+    locations = list(Location.objects.all())
+    if not locations:
+        # Fallback if database empty
+        return JsonResponse({
+            'name': 'No data yet',
+            'image': '/media/locations/addis_ababa.jpg'
+        })
+    loc = random.choice(locations)
+    return JsonResponse({
+        'name': loc.name,
+        'image': loc.image.url
+    })
